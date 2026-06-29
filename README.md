@@ -2,7 +2,7 @@
 Kubernetes and Docker configuration files for home server deployments of containerised web applications. 
 
 A *Raspberry Pi 5 with 8GB RAM* was used for the server host.
-K3s Kubernetes service was used instead of the standared Minikube due to the limited computational power of the Raspberry Pi 5.
+K3S Kubernetes service was used instead of the standared Minikube due to the limited computational power of the Raspberry Pi 5.
 
 Both implementations were exposed to the internet though a domain name.
 
