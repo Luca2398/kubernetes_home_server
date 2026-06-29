@@ -1,0 +1,13 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    ports:
+      - 9445:80
+    environment:
+      - DOMAIN=https://your-vaultwarden-url.com
+    volumes:
+      - /path/to/data:/data

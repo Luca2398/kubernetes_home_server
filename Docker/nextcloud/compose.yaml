@@ -1,0 +1,38 @@
+services:
+  db:
+    image: mariadb:lts
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=sAdBrY295#
+      - MYSQL_PASSWORD=sdBRy295#
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+
+  redis:
+    image: redis:alpine
+    restart: always
+
+  app:
+    image: nextcloud
+    restart: always
+    ports:
+      - 8080:80
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - /path/to/html:/var/www/html
+      - /path/to/data:/var/www/html/data
+    environment:
+      - MYSQL_PASSWORD=MYSQL_PASSWORD_VALUE
+      - MYSQL_DATABASE=MYSQL_DATABASE_NAME
+      - MYSQL_USER=MYSQL_USER_VALUE
+      - MYSQL_HOST=db
+      - REDIS_HOST=redis
+
+volumes:
+  nextcloud:
+  db:
