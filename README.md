@@ -13,7 +13,7 @@ Docker configuration files were created for the following applications:
   - Navidrome (WebDAV output for music on Nextcloud)
   - Joplin
   - Beszel
-  - Nginx proxy manager (to simplyfy the reverse proxy configuration)
+  - Nginx proxy manager (to simplify the reverse proxy configuration)
   - Vaultwarden
   - Watchtower
 
