@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: navidrome
+  namespace: navidrome
+  labels:
+    app: navidrome
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: navidrome
+  template:
+    metadata:
+      labels:
+        app: navidrome
+    spec:
+      containers:
+      - name: navidrome
+        image: deluan/navidrome:latest
+        ports:
+        - containerPort: 4533
+        env:
+        - name: ND_SCANNER_PURGEMISSING
+          valueFrom:
+            configMapKeyRef:
+              name: navidrome-config
+              key: ND_SCANNER_PURGEMISSING
+        
+        volumeMounts:
+        - name: navidrome-data
+          mountPath: /data
+        - name: nextcloud-music
+          mountPath: /music
+          readOnly: true
+      volumes:
+      - name: navidrome-data
+        persistentVolumeClaim:
+          claimName: navidrome-data
+      - name: nextcloud-music
+        hostPath:
+          path: /path/to/external/Music
+          type: Directory
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: navidrome-service
+  namespace: navidrome
+spec:
+  selector:
+    app: navidrome
+  ports:
+    - protocol: TCP
+      port: 4533
+      targetPort: 4533

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: immich-config
+  namespace: immich
+data:
+  # immich-server
+  UPLOAD_LOCATION: /DATABASE
+  TZ: YOUR_TIMEZONE
+  POSTGRES_INITDB_ARGS: "--data-checksums"
+  # immich-ml
+  IMMICH_MACHINE_LEARNING_WORKERS: "1"

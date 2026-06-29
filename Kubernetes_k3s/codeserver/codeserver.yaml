@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code-server
+  namespace: code-server
+  labels:
+    app: code-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: code-server
+  template:
+    metadata:
+      labels:
+        app: code-server
+    spec:
+      containers:
+      - name: code-server
+        image: lscr.io/linuxserver/code-server:latest
+        ports:
+        - containerPort: 8443
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: YOUR_TIMEZONE
+        - name: DEFAULT_WORKSPACE
+          value: "/path/to/workspace"
+        volumeMounts:
+        - name: config-storage
+          mountPath: /config
+        - name: project-storage
+          mountPath: /path/to/storage
+      volumes:
+      - name: config-storage
+        persistentVolumeClaim:
+          claimName: code-server-config-pvc
+      - name: project-storage
+        hostPath:
+          path: /path/to/storage
+          type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: code-server-service
+  namespace: code-server
+spec:
+  type: ClusterIP # default
+  selector:
+    app: code-server
+  ports:
+    - protocol: TCP
+      port: 8443
+      targetPort: 8443

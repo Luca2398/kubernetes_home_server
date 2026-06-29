@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: joplin
+  namespace: joplin
+  labels:
+    app: joplin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: joplin
+  template:
+    metadata:
+      labels:
+        app: joplin
+    spec:
+      containers:
+      - name: joplin
+        image: joplin/server:latest
+        ports:
+        - containerPort: 22300
+        env:
+        - name: MAILER_ENABLED
+          value: "1"
+        - name: MAILER_HOST
+          value: smtp.gmail.com
+        - name: MAILER_PORT
+          value: "465"
+        - name: MAILER_SECURE
+          value: "1"
+        - name: MAILER_NOREPLY_NAME
+          value: "Joplin"
+        - name: MAILER_NOREPLY_EMAIL
+          value: email@email.com
+        # Joplin configurations
+        - name: APP_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: joplin-config
+              key: APP_PORT
+        - name: APP_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: joplin-config
+              key: APP_BASE_URL
+        - name: DB_CLIENT
+          valueFrom:
+            configMapKeyRef:
+              name: joplin-config
+              key: DB_CLIENT
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: joplin-config
+              key: POSTGRES_PORT
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: joplin-config
+              key: POSTGRES_HOST
+        # Postgres secrets
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: joplin-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: joplin-secret
+              key: POSTGRES_DATABASE
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: joplin-secret
+              key: POSTGRES_USER
+        # Mailer secrets
+        - name: MAILER_AUTH_USER
+          valueFrom:
+            secretKeyRef:
+              name: joplin-secret
+              key: MAILER_AUTH_USER
+        volumeMounts:
+      volumes:
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: joplin-service
+  namespace: joplin
+spec:
+  type: ClusterIP # default
+  selector:
+    app: joplin
+  ports:
+    - protocol: TCP
+      port: 22300
+      targetPort: 22300

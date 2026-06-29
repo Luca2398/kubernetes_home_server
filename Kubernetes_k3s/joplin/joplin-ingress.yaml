@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: joplin-ingress
+  namespace: joplin
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: joplin-default-headers@kubernetescrd
+spec:
+  tls:
+  - hosts:
+    - YOUR_JOPLIN_URL
+    secretName: joplin-tls-cert
+  rules:
+  - host: YOUR_JOPLIN_URL
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: joplin-service # Matches codeserver service name
+            port:
+              number: 22300 # Matches codeserver service external port

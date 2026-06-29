@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-server
+  namespace: immich
+  labels:
+    app: immich-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-server
+  template:
+    metadata:
+      labels:
+        app: immich-server
+    spec:
+      containers:
+      - name: immich-server
+        image: ghcr.io/immich-app/immich-server:release
+        ports:
+        - containerPort: 2283
+        env:
+        # Configurations
+        - name: DB_HOSTNAME
+          value: "immich-postgres"
+        - name: REDIS_HOSTNAME
+          value: "immich-redis"
+        - name: IMMICH_MACHINE_LEARNING_URL
+          value: "http://immich-ml:3003"
+        - name: UPLOAD_LOCATION
+          valueFrom:
+            configMapKeyRef:
+              name: immich-config
+              key: UPLOAD_LOCATION
+        # DB configurations
+        - name: DB_DATABASE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_DATABASE_NAME
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_USERNAME
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: immich-secret
+              key: DB_PASSWORD
+
+        volumeMounts:
+        - name: immich-data
+          mountPath: /data
+        - name: nextcloud-photos
+          mountPath: /mnt/nextcloud-photos
+          readOnly: true
+      volumes:
+      - name: immich-data
+        persistentVolumeClaim:
+          claimName: immich-data
+      - name: nextcloud-photos
+        hostPath:
+          path: /path/to/external/Photos
+          type: Directory
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-server
+  namespace: immich
+spec:
+  selector:
+    app: immich-server
+  ports:
+    - protocol: TCP
+      port: 2283
+      targetPort: 2283

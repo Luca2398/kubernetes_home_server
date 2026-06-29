@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud-config
+  namespace: nextcloud
+data:
+  mariadb-url: mariadb-service
+  redis-url: redis-service
+  NEXTCLOUD_ADMIN_USER: "YOUR_ADMIN_USER"
+  NEXTCLOUD_TRUSTED_DOMAINS: "YOUR_CODESERVER_URL"
+  # Proxy configurations
+  NC_overwriteprotocol: "https"
+  NC_overwrite_cli_url: "https://YOUR_CODESERVER_URL"
+  NC_trusted_proxies: "10.42.0.0/16"
